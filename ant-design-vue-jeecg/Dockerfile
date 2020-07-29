@@ -16,7 +16,20 @@ RUN echo "server {  \
                       proxy_set_header        X-Real-IP \$remote_addr; \
                       proxy_set_header        X-Forwarded-For \$proxy_add_x_forwarded_for; \
                   } \                  
-                  
+                      location  =/sms-h5-backend2 { \
+                      proxy_pass              http://sms-h5-backend.default:30003; \
+                      proxy_set_header        Host sms-h5-backend; \
+                      proxy_set_header        X-Real-IP \$remote_addr; \
+                      proxy_set_header        X-Forwarded-For \$proxy_add_x_forwarded_for; \
+                  } \ 
+                      location  =/sms-h5-backend3 { \
+                      proxy_pass              http://sms-h5-backend.default:30003; \
+
+                  } \  
+                      location  /sms-h5-backend4 { \
+                      proxy_pass              http://sms-h5-backend.default:30003; \
+
+                  } \                   
                   #解决Router(mode: 'history')模式下，刷新路由地址不能找到页面的问题 \
                   location / { \
                      root   /var/www/html/; \
