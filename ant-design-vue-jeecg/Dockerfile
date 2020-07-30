@@ -41,8 +41,8 @@ RUN echo "server {  \
                   } \
                   access_log  /var/log/nginx/access.log ; \
               } " > /etc/nginx/conf.d/default.conf \
-    &&  mkdir  -p  /var/www \
-    &&  mkdir -p /var/www/html
+RUN  mkdir  -p  /var/www \
+RUN  mkdir -p /var/www/html
 
 ADD dist/ /var/www/html/
 EXPOSE 80
