@@ -28,6 +28,10 @@ public class SysAnnouncement implements Serializable {
      */
     @TableId(type = IdType.ID_WORKER_STR)
     private java.lang.String id;
+    
+    /*流程业务id*/
+    private java.lang.String actBusId;
+    
     /**
      * 标题
      */

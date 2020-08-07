@@ -9,6 +9,7 @@ import org.jeecg.modules.system.entity.SysUser;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.jeecg.modules.system.model.SysUserSysDepartModel;
 import org.jeecg.modules.system.vo.SysUserDepVo;
+import org.jeecg.common.system.vo.LoginUser;
 
 import java.util.List;
 
@@ -139,4 +140,6 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 	 * @return
 	 */
 	List<SysUser> queryByDepIds(@Param("departIds")List<String> departIds,@Param("username") String username);
+	
+	List<LoginUser> getUsersByName(@Param("name") String name);
 }
