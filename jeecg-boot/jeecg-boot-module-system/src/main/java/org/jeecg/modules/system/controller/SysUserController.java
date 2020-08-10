@@ -2,6 +2,7 @@ package org.jeecg.modules.system.controller;
 
 
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -868,12 +869,12 @@ public class SysUserController {
                 return result;
             }
         }
-
-		if (!smscode.equals(code)) {
+        //todo 暂无短信服务
+		/*if (!smscode.equals(code)) {
 			result.setMessage("手机验证码错误");
 			result.setSuccess(false);
 			return result;
-		}
+		}*/
 
 		try {
 			user.setCreateTime(new Date());// 设置创建时间

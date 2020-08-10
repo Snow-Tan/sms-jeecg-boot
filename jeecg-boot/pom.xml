@@ -16,7 +16,7 @@
 	<modules>
 		<module>jeecg-boot-base-common</module>
 		<module>jeecg-boot-module-system</module>
-        <module>jeecg-boot-module-activiti</module>
+		<module>jeecg-boot-module-activiti</module>
 	</modules>
 
 	<distributionManagement>
@@ -179,7 +179,7 @@
 			<version>42.2.6</version>
 			<scope>runtime</scope>
 		</dependency>
-		
+
 		 <!-- Quartz定时任务 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -216,7 +216,7 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-re</artifactId>
-			<version>2.2.11</version>
+			<version>2.2.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>

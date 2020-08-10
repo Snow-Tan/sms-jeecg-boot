@@ -5,6 +5,7 @@ import router from './router'
 import store from './store/'
 
 import { VueAxios } from "@/utils/request"
+import { getAction,postFormAction ,postAction} from "@/api/manage"
 
 import Antd from 'ant-design-vue'
 import Viser from 'viser-vue'
@@ -54,7 +55,18 @@ Vue.use(preview)
 Vue.use(vueBus);
 Vue.use(JeecgComponents);
 Vue.use(VueAreaLinkage);
-
+/*系统参数 名称 等等*/
+Vue.prototype.systemBase = {
+  year:'2020',
+  company:'xx公司',
+  title:'xx系统',
+  explain:'xx系统简单介绍',
+}
+// 挂载全局使用的方法
+Vue.prototype.doMian = "/jeecg-boot/";
+Vue.prototype.postFormAction = postFormAction;
+Vue.prototype.postDataAction = postAction;
+Vue.prototype.getAction = getAction;
 new Vue({
   router,
   store,

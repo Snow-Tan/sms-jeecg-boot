@@ -19,6 +19,14 @@ export function postAction(url,parameter) {
     data: parameter
   })
 }
+//post
+export function postFormAction(url,parameter) {
+  return axios({
+    url: url,
+    method:'post' ,
+    params: parameter
+  })
+}
 
 //post method= {post | put}
 export function httpAction(url,parameter,method) {

@@ -61,7 +61,7 @@
   export default {
     name: 'JSelectUserByDepModal',
     components: {},
-    props: ['modalWidth', 'multi', 'userIds'],
+    props: ['modalWidth', 'multi', 'userIds','customReturnField'],
     data() {
       return {
         queryParam: {
@@ -156,11 +156,14 @@
         if (this.userIds) {
           // 这里最后加一个 , 的原因是因为无论如何都要使用 in 查询，防止后台进行了模糊匹配，导致查询结果不准确
           let values = this.userIds.split(',') + ','
-          getUserList({
-            username: values,
-            pageNo: 1,
+          var param = {
+            // username: values,
+              pageNo: 1,
             pageSize: values.length
-          }).then((res) => {
+          }
+          param[this.customReturnField] = values;
+          console.log("回显用户参数",param)
+          getUserList(param).then((res) => {
             if (res.success) {
               let selectedRowKeys = []
               let realNames = []
@@ -186,6 +189,7 @@
         } else {
           this.loading = true
           let params = this.getQueryParams()//查询条件
+          if(params.username) params.username = `*${params.username}*`;
           await getUserList(params).then((res) => {
             if (res.success) {
               this.dataSource = res.result.records
@@ -264,7 +268,8 @@
         for (let i = 0, len = dataSource.length; i < len; i++) {
           if (this.selectedRowKeys.includes(dataSource[i].id)) {
             this.selectUserRows.push(dataSource[i]);
-            userIds = userIds + "," + dataSource[i].username
+            // userIds = userIds + "," + dataSource[i].username
+            userIds = userIds + "," + dataSource[i][this.customReturnField]
           }
         }
         this.selectUserIds = userIds.substring(1);
@@ -288,7 +293,9 @@
       // 根据选择的id来查询用户信息
       initQueryUserByDepId(selectedDepIds) {
         this.loading = true
-        return queryUserByDepId({id: selectedDepIds.toString()}).then((res) => {
+        let params = this.getQueryParams()//查询条件
+        let username = params.username||'';
+        return queryUserByDepId({id: selectedDepIds.toString(),username:username}).then((res) => {
           if (res.success) {
             this.dataSource = res.result;
             this.ipagination.total = res.result.length;

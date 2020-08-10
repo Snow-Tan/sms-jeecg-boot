@@ -53,8 +53,8 @@
             </a-select>
             <a-input style="width: 80%" size="large" placeholder="11 位手机号"></a-input>
           </a-input-group>-->
-
-      <a-row :gutter="16">
+      <!--todo 暂无短信服务-->
+      <!--<a-row :gutter="16">
         <a-col class="gutter-row" :span="16">
           <a-form-item
             fieldDecoratorId="captcha"
@@ -72,7 +72,7 @@
             @click.stop.prevent="getCaptcha"
             v-text="!state.smsSendBtn && '获取验证码'||(state.time+' s')"></a-button>
         </a-col>
-      </a-row>
+      </a-row>-->
 
       <a-form-item>
         <a-button

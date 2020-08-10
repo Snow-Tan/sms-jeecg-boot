@@ -69,19 +69,28 @@ public class LoginController {
 		//update-begin--Author:scott  Date:20190805 for：暂时注释掉密码加密逻辑，有点问题
 
 		//update-begin-author:taoyan date:20190828 for:校验验证码
-        String captcha = sysLoginModel.getCaptcha();
-        if(captcha==null){
-            result.error500("验证码无效");
-            return result;
-        }
-        String lowerCaseCaptcha = captcha.toLowerCase();
-		String realKey = MD5Util.MD5Encode(lowerCaseCaptcha+sysLoginModel.getCheckKey(), "utf-8");
-		Object checkCode = redisUtil.get(realKey);
-		if(checkCode==null || !checkCode.equals(lowerCaseCaptcha)) {
-			result.error500("验证码错误");
-			return result;
+		Boolean slidered = sysLoginModel.getSlidered();
+		if (slidered!=null){ //update-begin-author:pmc 滑块验证
+			if (!slidered){
+				result.error500("滑块验证失败");
+				return result;
+			}
+		}else {
+			String captcha = sysLoginModel.getCaptcha();
+			if(captcha==null){
+				result.error500("验证码无效");
+				return result;
+			}
+			String lowerCaseCaptcha = captcha.toLowerCase();
+			String realKey = MD5Util.MD5Encode(lowerCaseCaptcha+sysLoginModel.getCheckKey(), "utf-8");
+			Object checkCode = redisUtil.get(realKey);
+			if(checkCode==null || !checkCode.equals(lowerCaseCaptcha)) {
+				result.error500("验证码错误");
+				return result;
+			}
+			//update-end-author:taoyan date:20190828 for:校验验证码
 		}
-		//update-end-author:taoyan date:20190828 for:校验验证码
+
 		
 		//1. 校验用户是否有效
 		//update-begin-author:wangshuai date:20200601 for: 登录代码验证用户是否注销bug，if条件永远为false

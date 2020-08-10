@@ -8,7 +8,7 @@
       @search="onSearchDepUser">
       <a-button slot="enterButton" :disabled="disabled">选择用户</a-button>
     </a-input-search>
-    <j-select-user-by-dep-modal ref="selectModal" :modal-width="modalWidth" :multi="multi" @ok="selectOK" :user-ids="value" @initComp="initComp"/>
+    <j-select-user-by-dep-modal ref="selectModal" :customReturnField="customReturnField" :modal-width="modalWidth" :multi="multi" @ok="selectOK" :user-ids="value" @initComp="initComp"/>
   </div>
 </template>
 
@@ -38,6 +38,11 @@
         default: true,
         required: false
       },
+      // 自定义返回字段，默认返回 username
+      customReturnField: {
+        type: String,
+        default: 'username'
+      }
     },
     data() {
       return {

@@ -18,7 +18,7 @@
         <span slot="tab" :pagekey="page.fullPath">{{ page.meta.title }}</span>
       </a-tab-pane>
     </a-tabs>
-    <div style="margin: 12px 12px 0;">
+    <div style="margin: 12px 12px 0;overflow-y: auto;overflow-x: hidden;" :style="{height:contentHeight+'px'}">
       <transition name="page-toggle">
         <keep-alive v-if="multipage">
           <router-view v-if="reloadFlag"/>
@@ -76,6 +76,9 @@
         } else {
           return this.$store.state.app.multipage
         }
+      },
+      contentHeight() {
+        return window.innerHeight/2+300;
       }
     },
     created() {
@@ -170,10 +173,10 @@
 
       // update-begin-author:sunjianlei date:20200120 for: 动态更改页面标题
       changeTitle(title) {
-        let projectTitle = "Jeecg-Boot 企业级快速开发平台"
+        let projectTitle = this.systemBase.title
         // 首页特殊处理
         if (this.$route.path === indexKey) {
-          document.title = projectTitle
+          document.title =  '首页 · ' + projectTitle
         } else {
           document.title = title + ' · ' + projectTitle
         }

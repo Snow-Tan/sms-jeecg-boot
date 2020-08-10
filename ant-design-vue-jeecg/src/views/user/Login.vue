@@ -28,7 +28,8 @@
           </a-form-item>
 
           <a-row :gutter="0">
-            <a-col :span="16">
+            <!--换滑块-->
+            <!--<a-col :span="16">
               <a-form-item>
                 <a-input
                   v-decorator="['inputCode',validatorRules.inputCode]"
@@ -43,12 +44,18 @@
             <a-col :span="8" style="text-align: right">
               <img v-if="requestCodeSuccess" style="margin-top: 2px;" :src="randCodeImage" @click="handleChangeCheckCode"/>
               <img v-else style="margin-top: 2px;" src="../../assets/checkcode.png" @click="handleChangeCheckCode"/>
+              &lt;!&ndash;<j-graphic-code @success="generateCode" ref="jgraphicCodeRef" style="float: right" remote></j-graphic-code>&ndash;&gt;
+            </a-col>-->
+            <a-col :span="24">
+              <j-slider @onSuccess="sliderSuccess"></j-slider>
+              <span style="color: red;">{{slideredMsg}}</span>
             </a-col>
           </a-row>
 
 
         </a-tab-pane>
-        <a-tab-pane key="tab2" tab="手机号登陆">
+        <!--todo 暂无短信服务-->
+        <!--<a-tab-pane key="tab2" tab="手机号登陆">
           <a-form-item>
             <a-input
               v-decorator="['mobile',validatorRules.mobile]"
@@ -80,13 +87,13 @@
                 v-text="!state.smsSendBtn && '获取验证码' || (state.time+' s')"></a-button>
             </a-col>
           </a-row>
-        </a-tab-pane>
+        </a-tab-pane>-->
       </a-tabs>
 
       <a-form-item>
         <a-checkbox v-decorator="['rememberMe', {initialValue: true, valuePropName: 'checked'}]" >自动登陆</a-checkbox>
-        <router-link :to="{ name: 'alteration'}" class="forge-password" style="float: right;">
-          忘记密码
+        <router-link :disabled="true" :to="{ name: 'alteration'}" class="forge-password" style="float: right;">
+          忘记密码(暂无短信服务，不可用)
         </router-link>
        <router-link :to="{ name: 'register'}" class="forge-password" style="float: right;margin-right: 10px" >
           注册账户
@@ -135,10 +142,11 @@
   import store from '@/store/'
   import { USER_INFO } from "@/store/mutation-types"
   import LoginSelectModal from './LoginSelectModal.vue'
+  import JSlider from '@/components/jeecg/JSlider'
 
   export default {
     components: {
-      TwoStepCaptcha,
+      TwoStepCaptcha,JSlider,
       LoginSelectModal
     },
     data () {
@@ -171,7 +179,9 @@
         currentUsername:"",
         currdatetime:'',
         randCodeImage:'',
-        requestCodeSuccess:false
+        requestCodeSuccess:false,
+        slidered: false,
+        slideredMsg: ''
       }
     },
     created () {
@@ -222,11 +232,14 @@
       },
       handleSubmit () {
         let that = this
+        if (!that.slidered){
+          this.slideredMsg = '请拖动滑块！';
+        }
         let loginParams = {};
         that.loginBtn = true;
         // 使用账户密码登陆
         if (that.customActiveKey === 'tab1') {
-          that.form.validateFields([ 'username', 'password','inputCode', 'rememberMe' ], { force: true }, (err, values) => {
+          that.form.validateFields([ 'username', 'password',/*'inputCode',*/ 'rememberMe' ], { force: true }, (err, values) => {
             if (!err) {
               loginParams.username = values.username
               // update-begin- --- author:scott ------ date:20190805 ---- for:密码加密逻辑暂时注释掉，有点问题
@@ -236,6 +249,7 @@
               loginParams.remember_me = values.rememberMe
               // update-begin- --- author:scott ------ date:20190805 ---- for:密码加密逻辑暂时注释掉，有点问题
               loginParams.captcha = that.inputCodeContent
+              loginParams.slidered = that.slidered
               loginParams.checkKey = that.currdatetime
               console.log("登录参数",loginParams)
               that.Login(loginParams).then((res) => {
@@ -400,7 +414,11 @@
       }else{
         this.encryptedString = encryptedString;
       }
-    },
+    },/*滑块验证*/
+      sliderSuccess() {
+        this.slidered = true;
+        this.slideredMsg = "";
+      }
     }
   }
 </script>

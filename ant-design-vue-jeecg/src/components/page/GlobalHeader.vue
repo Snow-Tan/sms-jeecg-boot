@@ -17,8 +17,8 @@
         :type="collapsed ? 'menu-unfold' : 'menu-fold'"
         @click="toggle"/>
 
-      <span v-if="device === 'desktop'">欢迎进入 Jeecg-Boot 企业级快速开发平台</span>
-      <span v-else>Jeecg-Boot</span>
+      <span v-if="device === 'desktop'">欢迎进入 {{systemBase.title}}</span>
+      <span v-else>{{systemBase.title}}</span>
 
       <user-menu :theme="theme"/>
     </div>
@@ -26,7 +26,7 @@
     <div v-else :class="['top-nav-header-index', theme]">
       <div class="header-index-wide">
         <div class="header-index-left" :style="topMenuStyle.headerIndexLeft">
-          <logo class="top-nav-header" :show-title="device !== 'mobile'" :style="topMenuStyle.topNavHeader"/>
+          <logo :title="systemBase.title" class="top-nav-header" :show-title="device !== 'mobile'" :style="topMenuStyle.topNavHeader"/>
           <div v-if="device !== 'mobile'" :style="topMenuStyle.topSmenuStyle">
             <s-menu
               mode="horizontal"

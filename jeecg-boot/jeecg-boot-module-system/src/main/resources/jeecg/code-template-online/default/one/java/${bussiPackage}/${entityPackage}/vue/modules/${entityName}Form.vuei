@@ -168,7 +168,7 @@
   </#if>
 
   export default {
-    name: '${entityName}Form',
+    name: "${entityName}Form",
     components: {
       JFormContainer,
     <#if form_date>
@@ -218,8 +218,8 @@
         default: ()=>{},
         required: false
       },
-      //表单模式：true流程表单 false普通表单
-      formBpm: {
+      //表单模式：false流程表单 true普通表单
+      normal: {
         type: Boolean,
         default: false,
         required: false
@@ -254,21 +254,25 @@
     },
     computed: {
       formDisabled(){
-        if(this.formBpm===true){
+        if(this.normal===false){
           if(this.formData.disabled===false){
             return false
+          }else{
+            return true
           }
-          return true
         }
         return this.disabled
       },
       showFlowSubmitButton(){
-        if(this.formBpm===true){
+        if(this.normal===false){
           if(this.formData.disabled===false){
             return true
+          }else{
+            return false
           }
+        }else{
+          return false
         }
-        return false
       }
     },
     created () {
@@ -289,7 +293,7 @@
       },
       //渲染流程表单数据
       showFlowData(){
-        if(this.formBpm === true){
+        if(this.normal === false){
           let params = {id:this.formData.dataId};
           getAction(this.url.queryById,params).then((res)=>{
             if(res.success){

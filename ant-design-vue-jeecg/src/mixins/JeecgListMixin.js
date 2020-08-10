@@ -52,6 +52,25 @@ export const JeecgListMixin = {
       superQueryMatchType: 'and',
     }
   },
+  computed:{
+    scroll:function(){
+      var width = window.innerWidth;
+      let $antTable = window.document.getElementsByClassName("ant-row");
+      if ($antTable[0]){
+        width = $antTable[0].clientWidth;
+      }
+      console.log("$antTable",$antTable)
+      return {
+          // x:'max-content',
+          x:width,
+          y:window.innerHeight/2,
+      }
+    },
+    innerHeight:function(){
+      var innerHeight = window.innerHeight;
+      return  innerHeight;
+    },
+  },
   created() {
       if(!this.disableMixinCreated){
         console.log(' -- mixin created -- ')
@@ -62,6 +81,7 @@ export const JeecgListMixin = {
   },
   methods:{
     loadData(arg) {
+      if (!this.url) return;
       if(!this.url.list){
         this.$message.error("请设置url.list属性!")
         return
@@ -272,10 +292,10 @@ export const JeecgListMixin = {
             this.$warning({
               title: message,
               content: (
-                <div>
+                `<div>
                   <span>{msg}</span><br/>
                   <span>具体详情请 <a href={href} target="_blank" download={fileName}>点击下载</a> </span>
-                </div>
+                </div>`
               )
             })
           } else {

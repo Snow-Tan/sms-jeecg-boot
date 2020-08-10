@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.Context;
 import org.apache.tomcat.util.scan.StandardJarScanner;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
@@ -16,14 +17,16 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 @Slf4j
-@SpringBootApplication
+@SpringBootApplication(exclude = {org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class,
+        org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration.class
+        ,org.activiti.spring.boot.SecurityAutoConfiguration.class
+})
 public class JeecgApplication extends SpringBootServletInitializer {
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
         return application.sources(JeecgApplication.class);
     }
-
     public static void main(String[] args) throws UnknownHostException {
         //System.setProperty("spring.devtools.restart.enabled", "true");
 
