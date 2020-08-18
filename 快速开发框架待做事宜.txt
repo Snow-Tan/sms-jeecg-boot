@@ -1,0 +1,34 @@
+快速开发框架jeecg-boot 待开发工作
+低代码
+流程设计器
+表单设计器   https://gitee.com/kcz66/k-form-design
+大屏设计器   https://gitee.com/kcz66/k-form-design+个性化组件+集成Ant Design、echart
+报表设计器   https://gitee.com/kcz66/k-form-design
+
+
+
+1.整合 流程设计 activiti
+  https://gitee.com/happy-panda/jeecg-boot-activiti.git
+ 1.1 各个页面查询 sql优化
+ 1.2 需要灵活配置流程表单
+ 1.3 修改集成 activiti 修改bug
+ 
+2. 集成表单设计器 
+   https://gitee.com/kcz66/k-form-design
+   2.1 开发一个个性化组件，比如动态表格、tab布局等
+    https://www.antdv.com/components/table-cn/
+        
+3. Ant Design&Vue
+https://www.antdv.com/docs/vue/getting-started-cn/
+
+4. jeecg-boot优化改造
+   4.1 兼容sms框架网关访问方式
+   4.2 集成sms框架的 单点登录
+   
+    
+ 
+
+ 
+前端开源项目
+1）大屏
+https://gitee.com/MTrun/big-screen-vue-datav
