@@ -1,9 +1,12 @@
 快速开发框架jeecg-boot 待开发工作
+
+主要功能效果：
 低代码
 流程设计器
 表单设计器   https://gitee.com/kcz66/k-form-design
 大屏设计器   https://gitee.com/kcz66/k-form-design+个性化组件+集成Ant Design、echart
 报表设计器   https://gitee.com/kcz66/k-form-design
+app 方案        https://github.com/zhangdaiscott/jeecg-uniapp
 
 
 
