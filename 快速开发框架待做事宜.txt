@@ -25,7 +25,7 @@ app 方案        https://github.com/zhangdaiscott/jeecg-uniapp
 https://www.antdv.com/docs/vue/getting-started-cn/
 
 4. jeecg-boot优化改造
-   4.1 兼容sms框架网关访问方式
+   4.1 兼容sms框架网关访问方式  [已完成]
    4.2 集成sms框架的 单点登录
    
     
