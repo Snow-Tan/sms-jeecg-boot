@@ -319,6 +319,7 @@ export default {
         } else {
           this.error = "";
         }
+        formData.nodeType = this.$store.state.nodeType;
         this.postFormAction(this.url.pass,formData).then(res => {
           this.submitLoading = false;
           if (res.success) {
@@ -404,6 +405,7 @@ export default {
       this.getAction(this.url.getNextNode,{procDefId:v.procDefId, currActId:v.key}).then(res => {
         this.userLoading = false;
         if (res.success) {
+          this.$store.state.nodeType = res.result.type;
           if (res.result.type == 4) {
             this.isGateway = true;
             this.showAssign = false;
