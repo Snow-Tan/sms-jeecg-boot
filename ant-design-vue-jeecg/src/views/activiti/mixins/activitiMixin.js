@@ -23,6 +23,12 @@ export const activitiMixin = {
           routeName:'@/views/activiti/form/demoForm',
           component:() => import(`@/views/activiti/form/demoForm`),
           businessTable:'test_demo'
+        },
+        {
+          text: '示例表单1',
+          routeName: '@/views/activiti/form/demoForm1',
+          component: () => import(`@/views/activiti/form/demoForm1`),
+          businessTable: 'test_demo'
         }
       ]
     },
