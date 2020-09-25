@@ -37,7 +37,7 @@
   import pick from "lodash.pick";
 
   export default {
-    name: 'demoForm',
+    name: 'demoForm1',
     props:{
       /*全局禁用，可表示查看*/
       disabled:{
@@ -94,9 +94,10 @@
             let formData = res.result;
             formData.tableName = r.tableName;
             this.data = formData;
-            console.log("表单回显数据",this.data)
+            console.log("表单回显数据",this.data);
             this.$nextTick(() => {
-              this.form.setFieldsValue(pick(this.data,'name'))
+              //this.form.setFieldsValue(pick(this.data,'name'))
+              this.$refs.KFB.setData(this.data);
             });
             this.btndisabled = false;
           }else {

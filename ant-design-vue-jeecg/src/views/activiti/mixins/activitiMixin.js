@@ -28,7 +28,7 @@ export const activitiMixin = {
           text: '示例表单1',
           routeName: '@/views/activiti/form/demoForm1',
           component: () => import(`@/views/activiti/form/demoForm1`),
-          businessTable: 'test_demo'
+          businessTable: 'test_demo1'
         }
       ]
     },
