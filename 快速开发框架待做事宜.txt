@@ -4,8 +4,8 @@
 低代码
 流程设计器
 表单设计器   https://gitee.com/kcz66/k-form-design
-大屏设计器   https://gitee.com/kcz66/k-form-design+个性化组件+集成Ant Design、echart
-报表设计器   https://gitee.com/kcz66/k-form-design
+大屏设计器   https://gitee.com/kcz66/k-form-design+个性化组件+集成Ant Design、echart    dataGear
+报表设计器   https://gitee.com/kcz66/k-form-design    dataGear
 app 方案        https://github.com/zhangdaiscott/jeecg-uniapp
 
 
@@ -16,10 +16,16 @@ app 方案        https://github.com/zhangdaiscott/jeecg-uniapp
  1.2 需要灵活配置流程表单
  1.3 修改集成 activiti 修改bug
  
+ 1.4 流程中 实现 加签（串行、并行、 流程节点类型权限：协同、审核、知会）
+ 
+ 1.5 上传图片、上传文件等组件如何使用
+ 
 2. 集成表单设计器 
    https://gitee.com/kcz66/k-form-design
    2.1 开发一个个性化组件，比如动态表格、tab布局等
     https://www.antdv.com/components/table-cn/
+    
+   
         
 3. Ant Design&Vue
 https://www.antdv.com/docs/vue/getting-started-cn/
@@ -27,6 +33,14 @@ https://www.antdv.com/docs/vue/getting-started-cn/
 4. jeecg-boot优化改造
    4.1 兼容sms框架网关访问方式  [已完成]
    4.2 集成sms框架的 单点登录
+   4.3 上传功能调试。 本地、s3(minio s3 、sequoias3)
+   
+   4.4 升级到 2.3版本，减少bug
+   
+   
+   
+5. 数据可视化平台
+   dataGear 、superset、帆软、   
    
     
 前端开源项目
