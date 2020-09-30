@@ -15,6 +15,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * minio文件上传示例
@@ -41,7 +43,7 @@ public class SysUploadController {
         MultipartFile file = multipartRequest.getFile("file");// 获取上传文件对象
         String orgName = file.getOriginalFilename();// 获取文件名
         orgName = CommonUtils.getFileName(orgName);
-        String file_url =  MinioUtil.upload(file,bizPath);
+        String file_url = MinioUtil.upload(file, bizPath, null);
         //保存文件信息
         OSSFile minioFile = new OSSFile();
         minioFile.setFileName(orgName);
@@ -49,6 +51,17 @@ public class SysUploadController {
         ossFileService.save(minioFile);
         result.setMessage(file_url);
         result.setSuccess(true);
+        return result;
+    }
+
+    @PostMapping(value = "/activity/uploadMinio")
+    public Map uploadActivityFile(HttpServletRequest request, MultipartFile file) {
+        Map<String, Object> result = new HashMap<>();
+        String file_url = MinioUtil.upload(file);
+        Map<String, String> dataMap = new HashMap<>();
+        dataMap.put("url", file_url);
+        result.put("data", dataMap);
+        result.put("code", 0);
         return result;
     }
 }

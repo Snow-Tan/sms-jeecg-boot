@@ -2,6 +2,7 @@ package org.jeecg;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.Context;
+import org.apache.catalina.connector.Connector;
 import org.apache.tomcat.util.scan.StandardJarScanner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -49,11 +50,16 @@ public class JeecgApplication extends SpringBootServletInitializer {
      */
     @Bean
     public TomcatServletWebServerFactory tomcatFactory() {
-        return new TomcatServletWebServerFactory() {
+        TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory() {
             @Override
             protected void postProcessContext(Context context) {
                 ((StandardJarScanner) context.getJarScanner()).setScanManifest(false);
             }
         };
+        factory.addConnectorCustomizers((Connector connector) -> {
+            connector.setProperty("relaxedPathChars", "\"<>[\\]^`{|}");
+            connector.setProperty("relaxedQueryChars", "\"<>[\\]^`{|}");
+        });
+        return factory;
     }
 }

@@ -180,7 +180,7 @@ jeecg :
     accessKeyId: ??
     accessKeySecret: ??
   shiro:
-    excludeUrls: /test/jeecgDemo/demo3,/test/jeecgDemo/redisDemo/**,/category/**,/visual/**,/map/**,/jmreport/bigscreen2/**
+    excludeUrls: /test/jeecgDemo/demo3,/test/jeecgDemo/redisDemo/**,/category/**,/visual/**,/map/**,/jmreport/bigscreen2/**/,/oss/file/**,/sys/upload/**
   #阿里云oss存储配置
   oss:
     endpoint: oss-cn-beijing.aliyuncs.com
@@ -203,10 +203,10 @@ jeecg :
   file-view-domain: 127.0.0.1:8012
   # minio文件上传
   minio:
-    minio_url: http://minio.jeecg.com
-    minio_name: ??
-    minio_pass: ??
-    bucketName: otatest
+    minio_url: http://192.168.1.237:30900
+    minio_name: admin
+    minio_pass: admin123456
+    bucketName: activityfile
   #大屏报表参数设置
   jmreport:
     #是否需要校验token
@@ -218,6 +218,14 @@ jeecg :
     domain: https://wwo.wps.cn/office/
     appid: ??
     appsecret: ??
+  #文件上传ftp服务器配置
+  ftpclient:
+    host: 192.168.1.223 #ftp服务器地址
+    port: 21 #默认端口
+    userName: jeecg
+    password: jeecg1234
+    fileNginxPath: 192.168.1.223:9000 #文件在Nginx的路由地址
+
 #Mybatis输出sql日志
 logging:
   level:

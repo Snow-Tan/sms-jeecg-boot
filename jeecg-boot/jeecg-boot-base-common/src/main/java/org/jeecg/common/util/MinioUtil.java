@@ -3,6 +3,7 @@ package org.jeecg.common.util;
 import io.minio.MinioClient;
 import io.minio.errors.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -11,6 +12,8 @@ import java.io.InputStream;
 import java.net.URLDecoder;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * minio文件上传工具类
@@ -21,6 +24,8 @@ public class MinioUtil {
     private static String minioName;
     private static String minioPass;
     private static String bucketName;
+
+    private static String timePath = new SimpleDateFormat("/yyyyMM/dd/").format(new Date());
 
     public static void setMinioUrl(String minioUrl) {
         MinioUtil.minioUrl = minioUrl;
@@ -76,10 +81,22 @@ public class MinioUtil {
                 orgName=file.getName();
             }
             orgName = CommonUtils.getFileName(orgName);
-            String objectName = bizPath+"/"+orgName.substring(0, orgName.lastIndexOf(".")) + "_" + System.currentTimeMillis() + orgName.substring(orgName.indexOf("."));
+            boolean isImage = isImage(orgName);
+            String contentType = "application/octet-stream";
+            if (isImage) {
+                contentType = "image/jpeg";
+                if (StringUtils.isEmpty(bizPath)) {
+                    bizPath = "image";
+                }
+            } else {
+                if (StringUtils.isEmpty(bizPath)) {
+                    bizPath = "file";
+                }
+            }
+            String objectName = bizPath + timePath + orgName.substring(0, orgName.lastIndexOf(".")) + "_" + System.currentTimeMillis() + orgName.substring(orgName.indexOf("."));
 
             // 使用putObject上传一个本地文件到存储桶中。
-            minioClient.putObject(newBucket,objectName, stream,stream.available(),"application/octet-stream");
+            minioClient.putObject(newBucket, objectName, stream, stream.available(), contentType);
             stream.close();
             file_url = minioUrl+newBucket+"/"+objectName;
         }catch (IOException e){
@@ -108,14 +125,21 @@ public class MinioUtil {
         return file_url;
     }
 
+    private static boolean isImage(String orgName) {
+        String type = orgName.substring(orgName.indexOf(".") + 1);
+        if (type.equals("jpg") || type.equals("png") || type.equals("gif") || type.equals("bmp") || type.equals("jpeg") || type.equals("icon")) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * 文件上传
      * @param file
-     * @param bizPath
      * @return
      */
-    public static String upload(MultipartFile file, String bizPath) {
-        return  upload(file,bizPath,null);
+    public static String upload(MultipartFile file) {
+        return upload(file, null, null);
     }
 
     /**

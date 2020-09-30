@@ -685,7 +685,7 @@ public class SysBaseApiImpl implements ISysBaseAPI {
 	public String upload(MultipartFile file,String bizPath,String uploadType) {
 		String url = "";
 		if(CommonConstant.UPLOAD_TYPE_MINIO.equals(uploadType)){
-			url = MinioUtil.upload(file,bizPath);
+			url = MinioUtil.upload(file, bizPath, "common");
 		}else{
 			url = OssBootUtil.upload(file,bizPath);
 		}
