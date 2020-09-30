@@ -155,6 +155,11 @@ public class ActNodeServiceImpl extends ServiceImpl<ActNodeMapper, ActNode> impl
                         return ((UserTaskActivityBehavior) ((ActivityImpl) ac).getActivityBehavior())
                                 .getTaskDefinition();
                     }
+                } else if ("receiveTask".equals(ac.getProperty("type"))) {// 下一个节点是接收任务 9/17 tanfm
+                    Boolean currenLineConditionResule = getCurrenLineConditionResule(tr,variables);
+                    if(currenLineConditionResule) {
+                        return ((UserTaskActivityBehavior) ((ActivityImpl) ac).getActivityBehavior()).getTaskDefinition();
+                    }
                 }
 
             }

@@ -97,6 +97,25 @@ public interface ActivitiConstant {
      */
     Integer NODE_TYPE_PG = 4;
 
+    /**
+     * 节点类型 接收任务  9/17 tanfm新增
+     */
+    Integer NODE_TYPE_RT = 5;
+
+    /**
+     *  节点类型 包容网关 9/21 tanfm
+     */
+    Integer NODE_TYPE_IG = 6;
+
+    /**
+     *  节点类型 事件网关 9/21 tanfm
+     */
+    Integer NODE_TYPE_EVG = 7;
+    Integer NODE_TYPE_SP = 8;// 子流程
+    Integer NODE_TYPE_BEE = 9; // 边界错误事件
+    Integer NODE_TYPE_ST = 10; // 服务任务
+    Integer NODE_TYPE_ITE = 11; // 中間拋出事件
+
     /**E
      * 节点关联类型 角色
      */

@@ -152,7 +152,9 @@ public class ActBusinessController {
             //如果表单里有 标题  更新一下
             actBusiness.setTitle(busiData.get(ActivitiConstant.titleKey)+"");
         }
+        // 启动流程
         String processInstanceId = actZprocessService.startProcess(act);
+
         actBusiness.setProcInstId(processInstanceId);
         actBusiness.setStatus(ActivitiConstant.STATUS_DEALING);
         actBusiness.setResult(ActivitiConstant.RESULT_DEALING);

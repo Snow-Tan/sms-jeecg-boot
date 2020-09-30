@@ -32,7 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-
+import org.springframework.util.StringUtils;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.*;
@@ -87,7 +87,7 @@ public class ActZprocessServiceImpl extends ServiceImpl<ActZprocessMapper, ActZp
      */
     public void setLatestByProcessKey(String processKey) {
         ActZprocess actProcess = this.findTopByProcessKeyOrderByVersionDesc(processKey);
-        if(actProcess==null){
+        if (actProcess == null) {
             return;
         }
         actProcess.setLatest(true);
@@ -98,7 +98,7 @@ public class ActZprocessServiceImpl extends ServiceImpl<ActZprocessMapper, ActZp
         List<ActZprocess> list = this.list(new LambdaQueryWrapper<ActZprocess>().eq(ActZprocess::getProcessKey, processKey)
                 .orderByDesc(ActZprocess::getVersion)
         );
-        if (CollUtil.isNotEmpty(list)){
+        if (CollUtil.isNotEmpty(list)) {
             return list.get(0);
         }
         return null;
@@ -114,42 +114,48 @@ public class ActZprocessServiceImpl extends ServiceImpl<ActZprocessMapper, ActZp
         ActBusiness act = actBusinessService.getById(actBusiness.getId());
         String tableName = act.getTableName();
         String tableId = act.getTableId();
-        if (StrUtil.isBlank(tableId)||StrUtil.isBlank(tableName)){
+        if (StrUtil.isBlank(tableId) || StrUtil.isBlank(tableName)) {
             throw new JeecgBootException("没有业务表单数据");
         }
         /*表单数据写入*/
         Map<String, Object> busiData = actBusinessService.getBusiData(tableId, tableName);
         for (String key : busiData.keySet()) {
-            params.put(key,busiData.get(key));
+            params.put(key, busiData.get(key));
         }
         ProcessInstance pi = runtimeService.startProcessInstanceById(actBusiness.getProcDefId(), actBusiness.getId(), params);
         // 设置流程实例名称
         runtimeService.setProcessInstanceName(pi.getId(), actBusiness.getTitle());
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
-        for(Task task : tasks){
-            if(actBusiness.getFirstGateway()){
+        for (Task task : tasks) {
+            /*if(! StringUtils.isEmpty(task.getAssignee())) {// 设置Owner 9/24 tanfm
+                String username = loginUser.getUsername();
+                taskService.setOwner(task.getId(),username);
+                taskService.resolveTask(task.getId());
+                //task.setOwner(username);
+            }*/
+            if (actBusiness.getFirstGateway()) {
                 // 网关类型
                 List<LoginUser> users = getNode(task.getTaskDefinitionKey()).getUsers();
                 // 如果下个节点未分配审批人为空 取消结束流程
-                if(users==null||users.size()==0){
+                if (users == null || users.size() == 0) {
                     throw new RuntimeException("任务节点未分配任何候选审批人，发起流程失败");
-                }else{
+                } else {
                     // 分配了节点负责人分发给全部
-                    for(LoginUser user : users){
+                    for (LoginUser user : users) {
                         taskService.addCandidateUser(task.getId(), user.getUsername());
                         // 异步发消息
-                        sendActMessage(loginUser,user,actBusiness,task.getName(), actBusiness.getSendMessage(),
+                        sendActMessage(loginUser, user, actBusiness, task.getName(), actBusiness.getSendMessage(),
                                 actBusiness.getSendSms(), actBusiness.getSendEmail());
                     }
                 }
-            }else {
+            } else {
                 // 分配第一个任务用户
                 String assignees = actBusiness.getAssignees();
                 for (String assignee : assignees.split(",")) {
                     taskService.addCandidateUser(task.getId(), assignee);
                     // 异步发消息
                     LoginUser user = sysBaseAPI.getUserByName(assignee);
-                    sendActMessage(loginUser,user,actBusiness,task.getName(), actBusiness.getSendMessage(),
+                    sendActMessage(loginUser, user, actBusiness, task.getName(), actBusiness.getSendMessage(),
                             actBusiness.getSendSms(), actBusiness.getSendEmail());
                 }
             }
@@ -176,35 +182,36 @@ public class ActZprocessServiceImpl extends ServiceImpl<ActZprocessMapper, ActZp
 催办任务：  ${bpm_task}
 催办时间 :    ${datetime}
 催办内容 :    ${remark}*/
-        msgMap.put("bpm_name",act.getTitle());
-        msgMap.put("bpm_task",taskName);
+        msgMap.put("bpm_name", act.getTitle());
+        msgMap.put("bpm_task", taskName);
         msgMap.put("datetime", DateUtils.now());
         msgMap.put("remark", "请进入待办栏，尽快处理！");
         /*流程催办模板*/
         String msgText = sysBaseAPI.parseTemplateByCode("bpm_cuiban", msgMap);
-        this.sendMessage(act.getId(),fromUser,toUser,title,msgText,sendMessage,sendSms,sendEmail);
+        this.sendMessage(act.getId(), fromUser, toUser, title, msgText, sendMessage, sendSms, sendEmail);
     }
 
     /**
      * 发消息
-     * @param actBusId 流程业务id
-     * @param fromUser 发送人
-     * @param toUser 接收人
-     * @param title 标题
-     * @param msgText 信息内容
+     *
+     * @param actBusId    流程业务id
+     * @param fromUser    发送人
+     * @param toUser      接收人
+     * @param title       标题
+     * @param msgText     信息内容
      * @param sendMessage 系统消息
-     * @param sendSms 短信
-     * @param sendEmail 邮件
+     * @param sendSms     短信
+     * @param sendEmail   邮件
      */
-    public void sendMessage(String actBusId,LoginUser fromUser, LoginUser toUser,String title,String msgText,  Boolean sendMessage, Boolean sendSms, Boolean sendEmail) {
-        if (sendMessage!=null&&sendMessage){
-            sysBaseAPI.sendSysAnnouncement_act(actBusId,fromUser.getUsername(),toUser.getUsername(),title,msgText);
+    public void sendMessage(String actBusId, LoginUser fromUser, LoginUser toUser, String title, String msgText, Boolean sendMessage, Boolean sendSms, Boolean sendEmail) {
+        if (sendMessage != null && sendMessage) {
+            sysBaseAPI.sendSysAnnouncement_act(actBusId, fromUser.getUsername(), toUser.getUsername(), title, msgText);
         }
         //todo 以下需要购买阿里短信服务；设定邮件服务账号
-        if (sendSms!=null&&sendSms&& StrUtil.isNotBlank(toUser.getPhone())){
+        if (sendSms != null && sendSms && StrUtil.isNotBlank(toUser.getPhone())) {
             //DySmsHelper.sendSms(toUser.getPhone(), obj, DySmsEnum.REGISTER_TEMPLATE_CODE)
         }
-        if (sendEmail!=null&&sendEmail&& StrUtil.isNotBlank(toUser.getEmail())){
+        if (sendEmail != null && sendEmail && StrUtil.isNotBlank(toUser.getEmail())) {
             JavaMailSender mailSender = (JavaMailSender) SpringContextUtils.getBean("mailSender");
             SimpleMailMessage message = new SimpleMailMessage();
 // 设置发送方邮箱地址
@@ -224,26 +231,28 @@ public class ActZprocessServiceImpl extends ServiceImpl<ActZprocessMapper, ActZp
         node.setUsers(removeDuplicate(users));
         return node;
     }
+
     /**
      * 设置节点审批人
+     *
      * @param nodeId
      */
-    public List<LoginUser> getNodetUsers(String nodeId){
+    public List<LoginUser> getNodetUsers(String nodeId) {
         List<LoginUser> users = actNodeService.findUserByNodeId(nodeId);
         // 设置关联角色的用户
         List<Role> roles = actNodeService.findRoleByNodeId(nodeId);
-        for(Role r : roles){
+        for (Role r : roles) {
             List<LoginUser> userList = actNodeService.findUserByRoleId(r.getId());
             users.addAll(userList);
         }
         // 设置关联部门负责人
         List<Department> departments = actNodeService.findDepartmentByNodeId(nodeId);
-        for (Department d : departments){
+        for (Department d : departments) {
             List<LoginUser> userList = actNodeService.findUserDepartmentId(d.getId());
             users.addAll(userList);
         }
         // 判断获取部门负责人
-        if(actNodeService.hasChooseDepHeader(nodeId)){
+        if (actNodeService.hasChooseDepHeader(nodeId)) {
             List<LoginUser> allUser = actNodeService.queryAllUser();
             //申请人的部门负责人
             String createBy = getUserByNodeid(nodeId);
@@ -255,17 +264,18 @@ public class ActZprocessServiceImpl extends ServiceImpl<ActZprocessMapper, ActZp
             }
         }
         // 判断获取发起人
-        if(actNodeService.hasChooseSponsor(nodeId)){
+        if (actNodeService.hasChooseSponsor(nodeId)) {
             String createBy = getUserByNodeid(nodeId);
             LoginUser userByName = sysBaseAPI.getUserByName(createBy);
             users.add(userByName);
         }
-        users = users.stream().filter(u->StrUtil.equals("0",u.getDelFlag()+"")).collect(Collectors.toList());
+        users = users.stream().filter(u -> StrUtil.equals("0", u.getDelFlag() + "")).collect(Collectors.toList());
         return users;
     }
 
     /**
      * 根据节点id获取申请人
+     *
      * @param nodeId
      * @return
      */
@@ -278,6 +288,7 @@ public class ActZprocessServiceImpl extends ServiceImpl<ActZprocessMapper, ActZp
 
     /**
      * 去重
+     *
      * @param list
      * @return
      */
@@ -313,26 +324,41 @@ public class ActZprocessServiceImpl extends ServiceImpl<ActZprocessMapper, ActZp
         // 判断开始后的流向节点
         SequenceFlow sequenceFlow = startEvent.getOutgoingFlows().get(0);
         for (FlowElement element : elements) {
-            if(element.getId().equals(sequenceFlow.getTargetRef())){
-                if(element instanceof UserTask){
+            if (element.getId().equals(sequenceFlow.getTargetRef())) {
+                if (element instanceof UserTask) {
                     e = element;
                     node.setType(1);
                     break;
-                }else if(element instanceof ExclusiveGateway){
+                } else if (element instanceof ExclusiveGateway) {
                     e = element;
                     node.setType(3);
                     break;
-                }else if(element instanceof ParallelGateway){
+                } else if (element instanceof ParallelGateway) {
                     e = element;
                     node.setType(4);
                     break;
-                }else{
+                } else if (element instanceof InclusiveGateway) {
+                    e = element;
+                    node.setType(6);
+                    break;
+                } else if (element instanceof EventGateway) {
+                    e = element;
+                    node.setType(7);
+                    break;
+                } else if (element instanceof ReceiveTask){
+                    e = element;
+                    node.setType(5);
+                } else if (element instanceof ServiceTask){
+                    e = element;
+                    node.setType(10);
+                } else {
                     throw new RuntimeException("流程设计错误，开始节点后只能是用户任务节点、排他网关、并行网关");
                 }
             }
         }
         // 排他、平行网关直接返回
-        if(e instanceof ExclusiveGateway || e instanceof ParallelGateway){
+        if (e instanceof ExclusiveGateway || e instanceof ParallelGateway
+                || e instanceof InclusiveGateway || e instanceof EventGateway) {
             return node;
         }
         node.setTitle(e.getName());
@@ -345,55 +371,110 @@ public class ActZprocessServiceImpl extends ServiceImpl<ActZprocessMapper, ActZp
     public ProcessNodeVo getNextNode(String procDefId, String currActId) {
         ProcessNodeVo node = new ProcessNodeVo();
         // 当前执行节点id
-        ProcessDefinitionEntity dfe = (ProcessDefinitionEntity) ((RepositoryServiceImpl)repositoryService).getDeployedProcessDefinition(procDefId);
+        ProcessDefinitionEntity dfe = (ProcessDefinitionEntity) ((RepositoryServiceImpl) repositoryService).getDeployedProcessDefinition(procDefId);
         // 获取所有节点
         List<ActivityImpl> activitiList = dfe.getActivities();
         // 判断出当前流程所处节点，根据路径获得下一个节点实例
-        for(ActivityImpl activityImpl : activitiList){
+        for (ActivityImpl activityImpl : activitiList) {
             if (activityImpl.getId().equals(currActId)) {
-                // 获取下一个节点
-                List<PvmTransition> pvmTransitions = activityImpl.getOutgoingTransitions();
-
-                PvmActivity pvmActivity = pvmTransitions.get(0).getDestination();
-
-                String type = pvmActivity.getProperty("type").toString();
-                if("userTask".equals(type)){
-                    // 用户任务节点
-                    node.setType(ActivitiConstant.NODE_TYPE_TASK);
-                    node.setTitle(pvmActivity.getProperty("name").toString());
-                    // 设置关联用户
-                    List<LoginUser> users = getNodetUsers(pvmActivity.getId());
-                    node.setUsers(removeDuplicate(users));
-                }else if("exclusiveGateway".equals(type)){
-                    // 排他网关
-                    node.setType(ActivitiConstant.NODE_TYPE_EG);
-                    ActivityImpl pvmActivity1 = (ActivityImpl) pvmActivity;
-                    /*流程定义Id*/
-                    String procInsId = "";
-                    /*定义变量*/
-                    Map<String, Object> vals = Maps.newHashMap();
-                    List<ActBusiness> actBbyProcDefId = actBusinessService.findByProcDefId(procDefId);
-                    if (CollUtil.isNotEmpty(actBbyProcDefId)){
-                        ActBusiness actBusiness = actBbyProcDefId.get(0);
-                        vals = actBusinessService.getApplyForm(actBusiness.getTableId(), actBusiness.getTableName());
-                        procInsId = actBusiness.getProcInstId();
-                    }
-                    TaskDefinition taskDefinition = actNodeService.nextTaskDefinition(pvmActivity1, pvmActivity1.getId(), vals, procInsId);
-                    List<LoginUser> users = getNodetUsers(taskDefinition.getKey());
-                    node.setUsers(removeDuplicate(users));
-                }else if("parallelGateway".equals(type)){
-                    // 平行网关
-                    node.setType(ActivitiConstant.NODE_TYPE_PG);
-                }else if("endEvent".equals(type)){
-                    // 结束
-                    node.setType(ActivitiConstant.NODE_TYPE_END);
-                }else{
-                    throw new JeecgBootException("流程设计错误，包含无法处理的节点");
+                node = getProcessNodeVo(procDefId, node, activityImpl);
+                break;
+            }
+        }
+        if (!StringUtils.isEmpty(node.getType()))
+            return node;
+        // 当存在子流程时，获取子流程节点内的下一节点
+        for (ActivityImpl activity : activitiList) {
+            if ("subProcess".equals(activity.getProperty("type"))) {
+                PvmActivity initial = (PvmActivity) activity.getProperty("initial");
+                PvmActivity currAct = getCurrAct(initial, currActId);// 下一节点
+                node = getProcessNodeVo(procDefId, node, currAct);
+                if (node.getType().equals(ActivitiConstant.NODE_TYPE_END)) { // 跳到主流程
+                    node = getProcessNodeVo(procDefId, node, activity);
                 }
                 break;
             }
         }
+        return node;
+    }
 
+    private PvmActivity getCurrAct(PvmActivity pa, String currActId) {
+        while (true) {
+            pa = pa.getOutgoingTransitions().get(0).getDestination();
+            if (currActId.equals(pa.getId()))
+                break;
+        }
+        return pa;
+    }
+
+    private ProcessNodeVo getProcessNodeVo(String procDefId, ProcessNodeVo node, PvmActivity activityImpl) {
+        // 获取下一个节点
+        PvmActivity pvmActivity = activityImpl.getOutgoingTransitions().get(0).getDestination();
+
+        String type = pvmActivity.getProperty("type").toString();
+        if ("userTask".equals(type)) {
+            // 用户任务节点
+            node.setType(ActivitiConstant.NODE_TYPE_TASK);
+            node.setTitle(pvmActivity.getProperty("name").toString());
+            // 设置关联用户
+            List<LoginUser> users = getNodetUsers(pvmActivity.getId());
+            node.setUsers(removeDuplicate(users));
+        } else if ("exclusiveGateway".equals(type)) {
+            // 排他网关
+            node.setType(ActivitiConstant.NODE_TYPE_EG);
+            ActivityImpl pvmActivity1 = (ActivityImpl) pvmActivity;
+            /*流程定义Id*/
+            String procInsId = "";
+            /*定义变量*/
+            Map<String, Object> vals = Maps.newHashMap();
+            List<ActBusiness> actBbyProcDefId = actBusinessService.findByProcDefId(procDefId);
+            if (CollUtil.isNotEmpty(actBbyProcDefId)) {
+                ActBusiness actBusiness = actBbyProcDefId.get(0);
+                vals = actBusinessService.getApplyForm(actBusiness.getTableId(), actBusiness.getTableName());
+                procInsId = actBusiness.getProcInstId();
+            }
+            TaskDefinition taskDefinition = actNodeService.nextTaskDefinition(pvmActivity1, pvmActivity1.getId(), vals, procInsId);
+            List<LoginUser> users = getNodetUsers(taskDefinition.getKey());
+            node.setUsers(removeDuplicate(users));
+        } else if ("parallelGateway".equals(type)) {
+            // 平行网关
+            node.setType(ActivitiConstant.NODE_TYPE_PG);
+        } else if ("endEvent".equals(type)) {
+            // 结束
+            node.setType(ActivitiConstant.NODE_TYPE_END);
+        } else if ("inclusiveGateway".equals(type)) {
+            // 包容网关 9/21 tanfm
+            node.setType(ActivitiConstant.NODE_TYPE_IG);
+        } else if ("eventGateway".equals(type)) {
+            // 事件网关 9/21 tanfm
+            node.setType(ActivitiConstant.NODE_TYPE_EVG);
+        } else if ("subProcess".equals(type)) {
+            // 子流程
+            PvmActivity initial = (PvmActivity) pvmActivity.getProperty("initial"); // 存在缺陷，
+            node = getProcessNodeVo(procDefId, node, initial);
+        } else if ("serviceTask".equals(type)) {
+            // 服务任务
+            node.setType(ActivitiConstant.NODE_TYPE_ST);
+        }else if ("".equals(type)) {
+            // 边界错误事件
+            node.setType(ActivitiConstant.NODE_TYPE_BEE);
+        } else if ("intermediateThrowEvent".equals(type)) {
+            // 中間拋出事件
+            node.setType(ActivitiConstant.NODE_TYPE_ITE);
+        } else if ("receiveTask".equals(type)) { // 9/17 tanfm
+            // 接收任务
+            //String procDeId = pvmActivity.getParent().getId();
+            //String id = pvmActivity.getId();
+            //node = getNextNode(procDeId, id);
+            node.setType(ActivitiConstant.NODE_TYPE_RT);
+            /*node.setType(ActivitiConstant.NODE_TYPE_RT);
+            node.setTitle(pvmActivity.getProperty("name").toString());
+            // 设置关联用户
+            List<LoginUser> users = getNodetUsers(pvmActivity.getId());
+            node.setUsers(removeDuplicate(users));*/
+        } else {
+            throw new JeecgBootException("流程设计错误，包含无法处理的节点");
+        }
         return node;
     }
 }

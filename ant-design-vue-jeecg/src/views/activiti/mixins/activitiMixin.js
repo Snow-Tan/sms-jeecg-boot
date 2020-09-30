@@ -28,7 +28,19 @@ export const activitiMixin = {
           text: '示例表单1',
           routeName: '@/views/activiti/form/demoForm1',
           component: () => import(`@/views/activiti/form/demoForm1`),
-          businessTable: 'test_demo1'
+          businessTable: 'test_demo'
+        },
+        {
+          text: 'person',
+          routeName: '@/views/activiti/form/demoForm2',
+          component: () => import(`@/views/activiti/form/demoForm2`),
+          businessTable: 'test_demo2'
+        },
+        {
+          text: '文件上传',
+          routeName: '@/views/activiti/form/uploadForm',
+          component: () => import(`@/views/activiti/form/uploadForm`),
+          businessTable: 'test_demo3'
         }
       ]
     },

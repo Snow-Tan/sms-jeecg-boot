@@ -15,7 +15,7 @@ public class ProcessNodeVo {
     private String procDefId;
     /**节点名*/
     private String title;
-    /**节点类型 0开始 1用户任务 2结束 3排他网关 4并行网关*/
+    /**节点类型 0开始 1用户任务 2结束 3排他网关 4并行网关*/ // 6包容网关 7事件网关
     private Integer type;
     /**关联角色*/
     private List<Role> roles;
